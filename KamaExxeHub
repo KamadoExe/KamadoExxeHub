@@ -1,0 +1,67 @@
+--[[ 
+    🔥 Ro-Ghoul Auto Farm Script 
+    ✅ Compatível com executores: Delta, Fluxus, Hydrogen, Synapse X
+    📦 Para repositório: KamadoExxeHub
+    ✨ Feito por ChatGPT com base nas análises de NPCs enviadas
+--]]
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local VirtualInputManager = game:GetService("VirtualInputManager")
+local LocalPlayer = Players.LocalPlayer
+
+-- Lista de NPCs inimigos (baseada nas imagens que você enviou)
+local npcNomesValidos = {
+    "Low Rank Aogiri Member",
+    "Mid Rank Aogiri Member",
+    "High Rank Aogiri Member",
+    "First Class Investigator",
+    "Rank 1 Investigator",
+    "Rank 2 Investigator",
+    "Weak Ghoul",
+    "Athlete",
+    "Gyakusatsu",
+    "Ghoul",
+    "Human"
+}
+
+-- Configurações
+local distanciaMaxima = 60
+local delayAtaque = 0.5
+
+-- Funções utilitárias
+local function isAlvoValido(npc)
+    for _, nome in ipairs(npcNomesValidos) do
+        if string.find(npc.Name, nome) then
+            return true
+        end
+    end
+    return false
+end
+
+local function usarSkills()
+    local teclas = {"E", "R", "F"}
+    for _, tecla in ipairs(teclas) do
+        VirtualInputManager:SendKeyEvent(true, Enum.KeyCode[tecla], false, game)
+        task.wait(0.1)
+        VirtualInputManager:SendKeyEvent(false, Enum.KeyCode[tecla], false, game)
+    end
+end
+
+local function atacar()
+    -- Mouse1Click (ataque básico)
+    VirtualInputManager:SendMouseButtonEvent(500, 500, 0, true, game, 0)
+    task.wait(0.05)
+    VirtualInputManager:SendMouseButtonEvent(500, 500, 0, false, game, 0)
+end
+
+-- Loop principal
+RunService.RenderStepped:Connect(function()
+    local char = LocalPlayer.Character
+    if not char or not char:FindFirstChild("HumanoidRootPart") then return end
+
+    local alvoMaisProximo = nil
+    local menorDistancia = math.huge
+
+    for _, npc in pairs(workspace:GetDescendants()) do
+        if
