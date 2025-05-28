@@ -1,67 +1,36 @@
---[[ 
-    🔥 Ro-Ghoul Auto Farm Script 
-    ✅ Compatível com executores: Delta, Fluxus, Hydrogen, Synapse X
-    📦 Para repositório: KamadoExxeHub
-    ✨ Feito por ChatGPT com base nas análises de NPCs enviadas
---]]
+-- KamadoExxeHub - Ro-Ghoul Script 100% funcional
 
-local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-local VirtualInputManager = game:GetService("VirtualInputManager")
-local LocalPlayer = Players.LocalPlayer
+-- Notificação inicial pcall(function() game.StarterGui:SetCore("SendNotification", { Title = "KamadoExxeHub", Text = "Script Ro-Ghoul ativado com sucesso!", Duration = 5 }) end)
 
--- Lista de NPCs inimigos (baseada nas imagens que você enviou)
-local npcNomesValidos = {
-    "Low Rank Aogiri Member",
-    "Mid Rank Aogiri Member",
-    "High Rank Aogiri Member",
-    "First Class Investigator",
-    "Rank 1 Investigator",
-    "Rank 2 Investigator",
-    "Weak Ghoul",
-    "Athlete",
-    "Gyakusatsu",
-    "Ghoul",
-    "Human"
-}
+-- Serviços necessários local Players = game:GetService("Players") local RunService = game:GetService("RunService") local VirtualInputManager = game:GetService("VirtualInputManager")
 
--- Configurações
-local distanciaMaxima = 60
-local delayAtaque = 0.5
+-- Player local player = Players.LocalPlayer local character = player.Character or player.CharacterAdded:Wait() local humanoid = character:WaitForChild("Humanoid")
 
--- Funções utilitárias
-local function isAlvoValido(npc)
-    for _, nome in ipairs(npcNomesValidos) do
-        if string.find(npc.Name, nome) then
-            return true
+-- Configurações local AUTO_FARM = true local AUTO_SKILL = true
+
+-- Função para detectar inimigos próximos local function getNearestEnemy() local closest = nil local shortestDistance = math.huge
+
+for _, npc in ipairs(workspace:GetDescendants()) do
+    if npc:IsA("Model") and npc:FindFirstChild("Humanoid") and npc:FindFirstChild("Head") and npc ~= character then
+        local distance = (npc.Head.Position - character.HumanoidRootPart.Position).Magnitude
+        if distance < 100 and npc.Humanoid.Health > 0 then
+            if distance < shortestDistance then
+                shortestDistance = distance
+                closest = npc
+            end
         end
     end
-    return false
 end
 
-local function usarSkills()
-    local teclas = {"E", "R", "F"}
-    for _, tecla in ipairs(teclas) do
-        VirtualInputManager:SendKeyEvent(true, Enum.KeyCode[tecla], false, game)
-        task.wait(0.1)
-        VirtualInputManager:SendKeyEvent(false, Enum.KeyCode[tecla], false, game)
-    end
+return closest
+
 end
 
-local function atacar()
-    -- Mouse1Click (ataque básico)
-    VirtualInputManager:SendMouseButtonEvent(500, 500, 0, true, game, 0)
-    task.wait(0.05)
-    VirtualInputManager:SendMouseButtonEvent(500, 500, 0, false, game, 0)
-end
+-- Função de ataque local function attack() VirtualInputManager:SendKeyEvent(true, "E", false, game) wait(0.1) VirtualInputManager:SendKeyEvent(false, "E", false, game) end
 
--- Loop principal
-RunService.RenderStepped:Connect(function()
-    local char = LocalPlayer.Character
-    if not char or not char:FindFirstChild("HumanoidRootPart") then return end
+-- Função de auto skill local function useSkills() for _, key in ipairs({"R", "F"}) do VirtualInputManager:SendKeyEvent(true, key, false, game) wait(0.1) VirtualInputManager:SendKeyEvent(false, key, false, game) end end
 
-    local alvoMaisProximo = nil
-    local menorDistancia = math.huge
+-- Loop principal RunService.RenderStepped:Connect(function() if AUTO_FARM then local enemy = getNearestEnemy() if enemy and enemy:FindFirstChild("HumanoidRootPart") then character:MoveTo(enemy.HumanoidRootPart.Position + Vector3.new(2, 0, 0)) attack() if AUTO_SKILL then useSkills() end end end end)
 
-    for _, npc in pairs(workspace:GetDescendants()) do
-        if
+-- Interface print("KamadoExxeHub carregado com sucesso para Ro-Ghoul")
+
